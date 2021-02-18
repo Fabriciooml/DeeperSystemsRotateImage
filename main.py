@@ -1,4 +1,4 @@
-import os, zipfile, cv2, csv
+import os, zipfile, cv2, csv, glob
 import numpy as np
 import tensorflow as tf
 import keras
@@ -36,7 +36,6 @@ def get_label(labels):
 batch_size = 32
 num_classes = 4
 epochs = 100
-num_predictions = 20
 save_dir = os.path.join(os.getcwd(), 'saved_models')
 model_name = 'keras_cifar10_trained_model.h5'
 
@@ -69,9 +68,8 @@ with open("train.truth.csv", "r") as f:
 
 X = []
 
-path_train_images = './train'
 for filename in train_truth:
-  img = cv2.imread(os.path.join(path_train_images, filename))
+  img = cv2.imread(os.path.join('./train', filename))
   
   X.append(prepare_image(img))
 
@@ -137,24 +135,38 @@ model.save(model_path)
 test = []
 images_test = []
 for filename in glob.glob(os.path.join("test", "*.jpg")):
-  img = cv2.imread(os.path.join(path_train_images, filename))
+  img = cv2.imread(filename)
   
   test.append(prepare_image(img))
+  
   images_test.append(filename)
   
 test = np.array(test)
 test = test.astype('float32')
 
 test /= 255
-
+correct_predicitions = []
 with open('test.preds.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(["dn", "label"])
     predictions = model.predict(test)
-    i=0
+    
     for i in range(len(images_test)):
-      
-      writer.writerow([images_test[i], get_label(predictions[i])])
+      correct_predicitions.append(get_label(predictions[i]))
+      writer.writerow([images_test[i], correct_predicitions[i]])
+i=0
+correct_images = []
+for filename in images_test:
+  img = cv2.imread(filename)
+  if correct_predicitions[i] == 'rotated_left':
+    img = cv2.rotate(img, cv2.cv2.ROTATE_90_CLOCKWISE)
+  if correct_predicitions[i] == 'rotated_right':
+    img = cv2.rotate(img, cv2.cv2.ROTATE_90_COUNTERCLOCKWISE)
+  if correct_predicitions[i] == 'upside_down':
+    img = cv2.rotate(img, cv2.cv2.ROTATE_180)
+  correct_images.append(prepare_image(img))
+  i+=1
+correct_images = np.array(correct_images)
 
-
+np.save("correct_images", correct_images)
 
