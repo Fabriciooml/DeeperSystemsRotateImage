@@ -1,6 +1,5 @@
-import os, zipfile, cv2, csv, glob
+import os, cv2, csv, glob
 import numpy as np
-import tensorflow as tf
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
@@ -38,13 +37,6 @@ num_classes = 4
 epochs = 100
 save_dir = os.path.join(os.getcwd(), 'saved_models')
 model_name = 'keras_cifar10_trained_model.h5'
-
-for item in os.listdir("./"): # loop through items in dir
-    if item.endswith(".zip"): # check for ".zip" extension
-        file_name = os.path.abspath(item) # get full path of files
-        zip_ref = zipfile.ZipFile(file_name) # create zipfile object
-        zip_ref.extractall("./") # extract file to dir
-        zip_ref.close() # close file
 
 train_truth = []
 y=[]
