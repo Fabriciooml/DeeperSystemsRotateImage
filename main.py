@@ -139,13 +139,13 @@ test = test.astype('float32')
 test /= 255
 correct_predicitions = []
 with open('test.preds.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(["dn", "label"])
+    writer = csv.writer(file, lineterminator = '\n')
+    writer.writerow(["fn", "label"])
     predictions = model.predict(test)
     
     for i in range(len(images_test)):
       correct_predicitions.append(get_label(predictions[i]))
-      writer.writerow([images_test[i], correct_predicitions[i]])
+      writer.writerow([images_test[i][5:], correct_predicitions[i]])
 i=0
 correct_images = []
 for filename in images_test:
